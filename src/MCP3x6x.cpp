@@ -20,13 +20,15 @@
 #endif
 
 MCP3x6x::MCP3x6x(const uint16_t MCP3x6x_DEVICE_TYPE, const uint8_t pinCS, SPIClass *theSPI,
-                 const uint8_t pinMOSI, const uint8_t pinMISO, const uint8_t pinCLK)
+                 SPISettings theSPISettings, const uint8_t pinMOSI, const uint8_t pinMISO,
+                 const uint8_t pinCLK)
     : settings(MCP3x6x_DEVICE_TYPE) {
-  _spi     = theSPI;
-  _pinMISO = pinMISO;
-  _pinMOSI = pinMOSI;
-  _pinCLK  = pinCLK;
-  _pinCS   = pinCS;
+  _spi         = theSPI;
+  _spiSettings = theSPISettings;
+  _pinMISO     = pinMISO;
+  _pinMOSI     = pinMOSI;
+  _pinCLK      = pinCLK;
+  _pinCS       = pinCS;
 
   switch (MCP3x6x_DEVICE_TYPE) {
     case MCP3461_DEVICE_TYPE:
@@ -60,9 +62,9 @@ MCP3x6x::MCP3x6x(const uint16_t MCP3x6x_DEVICE_TYPE, const uint8_t pinCS, SPICla
 }
 
 MCP3x6x::MCP3x6x(const uint8_t pinIRQ, const uint8_t pinMCLK, const uint16_t MCP3x6x_DEVICE_TYPE,
-                 const uint8_t pinCS, SPIClass *theSPI, const uint8_t pinMOSI,
-                 const uint8_t pinMISO, const uint8_t pinCLK)
-    : MCP3x6x(MCP3x6x_DEVICE_TYPE, pinCS, theSPI, pinMOSI, pinMISO, pinCLK) {
+                 const uint8_t pinCS, SPIClass *theSPI, SPISettings theSPISettings,
+                 const uint8_t pinMOSI, const uint8_t pinMISO, const uint8_t pinCLK)
+    : MCP3x6x(MCP3x6x_DEVICE_TYPE, pinCS, theSPI, theSPISettings, pinMOSI, pinMISO, pinCLK) {
   _pinIRQ  = pinIRQ;
   _pinMCLK = pinMCLK;
 
@@ -78,7 +80,7 @@ void MCP3x6x::_reverse_array(uint8_t *array, size_t size) {
 }
 
 MCP3x6x::status_t MCP3x6x::_transfer(uint8_t *data, uint8_t addr, size_t size) {
-  _spi->beginTransaction(SPISettings(MCP3x6x_SPI_SPEED, MCP3x6x_SPI_ORDER, MCP3x6x_SPI_MODE));
+  _spi->beginTransaction(_spiSettings);
   noInterrupts();
   digitalWrite(_pinCS, LOW);
   _status.raw = _spi->transfer(addr);
@@ -96,7 +98,11 @@ bool MCP3x6x::begin(MCP3x6x::MCPSettings set) {
   pinMode(_pinCS, OUTPUT);
   digitalWrite(_pinCS, HIGH);
 
+#if ARDUINO_ARCH_ESP32
+  _spi->begin(_pinCLK, _pinMISO, _pinMOSI, _pinCS);
+#else
   _spi->begin();
+#endif
 
 #if ARDUINO_ARCH_SAMD
   // todo figure out how to get dynamicaly sercom index
