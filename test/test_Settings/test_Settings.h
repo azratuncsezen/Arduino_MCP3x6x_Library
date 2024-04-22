@@ -23,5 +23,6 @@ void setUp(void);
 void tearDown(void);
 
 void test_Settings(void);
+void test_Sizes(void);
 
 #endif  // TEST_TEST_SETTINGS_TEST_SETTINGS_H_

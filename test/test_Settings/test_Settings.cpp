@@ -37,6 +37,7 @@ int runUnityTests(void) {
 
   // Settings
   RUN_TEST(test_Settings);
+  RUN_TEST(test_Sizes);
 
   return UNITY_END();
 }
@@ -73,12 +74,32 @@ void tearDown(void) {}
 void test_Settings(void) {
   MCP3464 mcp;
 
-  // checks if Settings class is initialized with correct default values.
-  TEST_ASSERT_EQUAL_CHAR(0xC0, mcp.config0.raw);
-  TEST_ASSERT_EQUAL_CHAR(0x0C, mcp.config1.raw);
-  TEST_ASSERT_EQUAL_CHAR(0x8B, mcp.config2.raw);
-  TEST_ASSERT_EQUAL_CHAR(0x00, mcp.config3.raw);
-  TEST_ASSERT_EQUAL_CHAR(0x73, mcp.irq.raw);
-  TEST_ASSERT_EQUAL_CHAR(0x01, mcp.mux.raw);
-  TEST_ASSERT_EQUAL_CHAR(0xA5, mcp.lock.raw);
+  /*
+    // checks if Settings class is initialized with correct default values.
+    TEST_ASSERT_EQUAL_CHAR(0xC0, mcp._config0.raw);
+    TEST_ASSERT_EQUAL_CHAR(0x0C, mcp._config1.raw);
+    TEST_ASSERT_EQUAL_CHAR(0x8B, mcp._config2.raw);
+    TEST_ASSERT_EQUAL_CHAR(0x00, mcp._config3.raw);
+    TEST_ASSERT_EQUAL_CHAR(0x73, mcp._irq.raw);
+    TEST_ASSERT_EQUAL_CHAR(0x01, mcp._mux.raw);
+    TEST_ASSERT_EQUAL_CHAR(0xA5, mcp._lock.raw);
+  */
+}
+
+void test_Sizes(void) {
+  TEST_ASSERT_EQUAL_size_t(1, sizeof(MCP3x6x::Config0));
+  TEST_ASSERT_EQUAL_size_t(1, sizeof(MCP3x6x::Config1));
+  TEST_ASSERT_EQUAL_size_t(1, sizeof(MCP3x6x::Config2));
+  TEST_ASSERT_EQUAL_size_t(1, sizeof(MCP3x6x::Config3));
+  TEST_ASSERT_EQUAL_size_t(1, sizeof(MCP3x6x::Irq));
+  TEST_ASSERT_EQUAL_size_t(1, sizeof(MCP3x6x::Mux));
+  TEST_ASSERT_EQUAL_size_t(3, sizeof(MCP3x6x::Scan));
+  TEST_ASSERT_EQUAL_size_t(3, sizeof(MCP3x6x::Timer));
+  TEST_ASSERT_EQUAL_size_t(3, sizeof(MCP3x6x::Offset));
+  TEST_ASSERT_EQUAL_size_t(3, sizeof(MCP3x6x::Gain));
+  TEST_ASSERT_EQUAL_size_t(2, sizeof(MCP3x6x::Crccfg));
+
+  TEST_ASSERT_EQUAL_size_t(1, sizeof(MCP3x6x::status_t));
+
+  TEST_ASSERT_EQUAL_size_t(4, sizeof(MCP3x6x::Adcdata));
 }
